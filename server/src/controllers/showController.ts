@@ -5,6 +5,36 @@ import { searchMDL } from '../services/mdlService';
 import { cacheService } from '../services/cacheService';
 import { SearchResponse, Show } from '../types/show';
 
+// Add helper function for title normalization
+function normalizeTitle(title: string): string {
+  return title
+    .toLowerCase()
+    .replace(/[^\w\s]/g, '') // Remove special characters
+    .replace(/\s+/g, ' ') // Normalize spaces
+    .trim();
+}
+
+// Add helper function for title similarity
+function areTitlesSimilar(title1: string, title2: string): boolean {
+  const normalized1 = normalizeTitle(title1);
+  const normalized2 = normalizeTitle(title2);
+
+  // Check exact match after normalization
+  if (normalized1 === normalized2) return true;
+
+  // Check if one title contains the other
+  if (normalized1.includes(normalized2) || normalized2.includes(normalized1)) return true;
+
+  // Check if titles share significant words
+  const words1 = normalized1.split(' ');
+  const words2 = normalized2.split(' ');
+  const commonWords = words1.filter(word => words2.includes(word));
+  
+  // If titles share more than 50% of their words, consider them similar
+  const similarity = commonWords.length / Math.min(words1.length, words2.length);
+  return similarity > 0.5;
+}
+
 export const searchShows = async (req: Request, res: Response) => {
   try {
     const { query, page = 1 } = req.query;
@@ -31,17 +61,11 @@ export const searchShows = async (req: Request, res: Response) => {
     // Match shows from both sources by title similarity
     const combinedShows = imdbResults.shows.map((imdbShow) => {
       const vikiShow = vikiResults.find(
-        (vs) =>
-          vs.title.toLowerCase().includes(imdbShow.title.toLowerCase()) ||
-          imdbShow.title.toLowerCase().includes(vs.title.toLowerCase())
+        (vs) => areTitlesSimilar(vs.title, imdbShow.title)
       );
 
       const mdlShow = mdlResults.find(
-        (ms) =>
-          ms.title.toLowerCase().replace(/[^\w\s]/g, '') ===
-            imdbShow.title.toLowerCase().replace(/[^\w\s]/g, '') ||
-          ms.title.toLowerCase().includes(imdbShow.title.toLowerCase()) ||
-          imdbShow.title.toLowerCase().includes(ms.title.toLowerCase())
+        (ms) => areTitlesSimilar(ms.title, imdbShow.title)
       );
 
       console.log('🔍 Matching shows:', {
@@ -68,6 +92,7 @@ export const searchShows = async (req: Request, res: Response) => {
         vikiId: vikiShow?.vikiId || null,
         mdlRating: mdlShow?.rating || 0,
         mdlId: mdlShow?.mdlId || null,
+        mdlHref: mdlShow?.href || null,
       };
     });
 

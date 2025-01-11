@@ -69,7 +69,7 @@ export default function ShowCard({ show }: ShowCardProps) {
           <RatingWithLogo
             source="MDL"
             rating={show.mdlRating}
-            url={show.mdlId ? `https://mydramalist.com/${show.mdlId}` : undefined}
+            url={show.mdlHref || undefined}
           />
         </div>
       </div>

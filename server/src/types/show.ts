@@ -8,6 +8,7 @@ export interface Show {
   vikiId: string | null;
   mdlRating: number;
   mdlId: string | null;
+  mdlHref: string | null;
   year?: string;
 }
 
