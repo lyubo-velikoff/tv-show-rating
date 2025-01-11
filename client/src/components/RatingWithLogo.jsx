@@ -1,10 +1,12 @@
 import PropTypes from 'prop-types';
 import imdbLogo from '../assets/images/imdb-logo.js';
 import vikiLogo from '../assets/images/viki-logo.js';
+import mdlLogo from '../assets/images/mdl-logo.js';
 
 const LOGOS = {
   IMDb: imdbLogo,
   Viki: vikiLogo,
+  MDL: mdlLogo,
 };
 
 export default function RatingWithLogo({ source, rating, url }) {
@@ -45,7 +47,7 @@ export default function RatingWithLogo({ source, rating, url }) {
 }
 
 RatingWithLogo.propTypes = {
-  source: PropTypes.oneOf(['IMDb', 'Viki']).isRequired,
+  source: PropTypes.oneOf(['IMDb', 'Viki', 'MDL']).isRequired,
   rating: PropTypes.number,
   url: PropTypes.string,
 }; 

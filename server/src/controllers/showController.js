@@ -1,5 +1,6 @@
 import { searchIMDb } from '../services/apiServices.js';
 import { searchViki } from '../services/vikiService.js';
+import { searchMDL } from '../services/mdlService.js';
 import { cacheService } from '../services/cacheService.js';
 
 export const searchShows = async (req, res) => {
@@ -13,10 +14,11 @@ export const searchShows = async (req, res) => {
       return res.json(cachedResults);
     }
 
-    // Fetch results from both sources
-    const [imdbResults, vikiResults] = await Promise.all([
+    // Fetch results from all sources
+    const [imdbResults, vikiResults, mdlResults] = await Promise.all([
       searchIMDb(query, parseInt(page)),
       searchViki(query),
+      searchMDL(query),
     ]);
 
     // Match shows from both sources by title similarity
@@ -25,6 +27,14 @@ export const searchShows = async (req, res) => {
         (vs) =>
           vs.title.toLowerCase().includes(imdbShow.title.toLowerCase()) ||
           imdbShow.title.toLowerCase().includes(vs.title.toLowerCase())
+      );
+
+      const mdlShow = mdlResults.find(
+        (ms) =>
+          ms.title.toLowerCase().replace(/[^\w\s]/g, '') ===
+            imdbShow.title.toLowerCase().replace(/[^\w\s]/g, '') ||
+          ms.title.toLowerCase().includes(imdbShow.title.toLowerCase()) ||
+          imdbShow.title.toLowerCase().includes(ms.title.toLowerCase())
       );
 
       console.log('🔍 Matching shows:', {
@@ -36,12 +46,21 @@ export const searchShows = async (req, res) => {
               vikiId: vikiShow.vikiId,
             }
           : 'No match',
+        mdlShow: mdlShow
+          ? {
+              title: mdlShow.title,
+              rating: mdlShow.rating,
+              mdlId: mdlShow.mdlId,
+            }
+          : 'No match',
       });
 
       return {
         ...imdbShow,
         vikiRating: vikiShow?.rating || 0,
         vikiId: vikiShow?.vikiId || null,
+        mdlRating: mdlShow?.rating || 0,
+        mdlId: mdlShow?.mdlId || null,
       };
     });
 

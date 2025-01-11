@@ -63,6 +63,11 @@ export default function ShowCard({ show }) {
             rating={show.vikiRating}
             url={show.vikiId ? `https://www.viki.com/tv/${show.vikiId}` : undefined}
           />
+          <RatingWithLogo
+            source="MDL"
+            rating={show.mdlRating}
+            url={show.mdlId ? `https://mydramalist.com/${show.mdlId}` : undefined}
+          />
         </div>
       </div>
     </div>
@@ -78,6 +83,8 @@ ShowCard.propTypes = {
     rating: PropTypes.number,
     vikiRating: PropTypes.number,
     vikiId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
+    mdlRating: PropTypes.number,
+    mdlId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
     year: PropTypes.string,
   }).isRequired,
 };
