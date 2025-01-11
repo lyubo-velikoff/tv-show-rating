@@ -1,8 +1,14 @@
 import React from 'react';
 import ShowCard from './ShowCard';
 import LoadingSpinner from './LoadingSpinner';
+import { Show } from '../types/show';
 
-export default function ShowGrid({ shows, loading }) {
+interface ShowGridProps {
+  shows: Show[];
+  loading: boolean;
+}
+
+const ShowGrid: React.FC<ShowGridProps> = ({ shows, loading }) => {
   if (loading) {
     return <LoadingSpinner />;
   }
@@ -14,4 +20,6 @@ export default function ShowGrid({ shows, loading }) {
       ))}
     </div>
   );
-} 
+};
+
+export default ShowGrid; 

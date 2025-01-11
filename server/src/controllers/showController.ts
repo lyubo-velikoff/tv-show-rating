@@ -1,22 +1,29 @@
-import { searchIMDb } from '../services/apiServices.js';
-import { searchViki } from '../services/vikiService.js';
-import { searchMDL } from '../services/mdlService.js';
-import { cacheService } from '../services/cacheService.js';
+import { Request, Response } from 'express';
+import { searchIMDb } from '../services/apiServices';
+import { searchViki } from '../services/vikiService';
+import { searchMDL } from '../services/mdlService';
+import { cacheService } from '../services/cacheService';
+import { SearchResponse, Show } from '../types/show';
 
-export const searchShows = async (req, res) => {
+export const searchShows = async (req: Request, res: Response) => {
   try {
     const { query, page = 1 } = req.query;
+
+    if (typeof query !== 'string') {
+      return res.status(400).json({ message: 'Query parameter must be a string' });
+    }
+
     const cacheKey = `${query}_page${page}`;
 
     // Check cache first
-    const cachedResults = cacheService.get(cacheKey);
+    const cachedResults = cacheService.get<SearchResponse>(cacheKey);
     if (cachedResults) {
       return res.json(cachedResults);
     }
 
     // Fetch results from all sources
     const [imdbResults, vikiResults, mdlResults] = await Promise.all([
-      searchIMDb(query, parseInt(page)),
+      searchIMDb(query, Number(page)),
       searchViki(query),
       searchMDL(query),
     ]);
@@ -66,14 +73,14 @@ export const searchShows = async (req, res) => {
 
     // Filter out results with missing posters or titles
     const validResults = combinedShows.filter(
-      (show) => show.title && show.poster
+      (show): show is Show => Boolean(show.title && show.poster)
     );
 
-    const response = {
+    const response: SearchResponse = {
       shows: validResults,
-      totalResults: imdbResults.totalResults,
-      currentPage: parseInt(page),
-      totalPages: Math.ceil(imdbResults.totalResults / 10),
+      totalResults: Number(imdbResults.totalResults),
+      currentPage: Number(page),
+      totalPages: Math.ceil(Number(imdbResults.totalResults) / 10),
     };
 
     // Cache results
@@ -81,20 +88,43 @@ export const searchShows = async (req, res) => {
 
     res.json(response);
   } catch (error) {
-    console.error('Search error:', error.message);
+    console.error('Search error:', error);
     res.status(500).json({
       message: 'Failed to search shows',
-      error: process.env.NODE_ENV === 'development' ? error.message : undefined,
+      error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
     });
   }
 };
 
-export const getShowDetails = async (req, res) => {
+export const getShowDetails = async (req: Request, res: Response) => {
   try {
     const { id } = req.params;
-    // Implement show details fetching
-    res.json({ message: 'Not implemented yet' });
+
+    // Fetch show details from a service or database
+    // This is a placeholder implementation
+    const showDetails = await fetchShowDetailsFromService(id);
+
+    if (!showDetails) {
+      return res.status(404).json({ message: 'Show not found' });
+    }
+
+    res.json(showDetails);
   } catch (error) {
-    res.status(500).json({ message: 'Failed to get show details' });
+    console.error('Error fetching show details:', error);
+    res.status(500).json({
+      message: 'Failed to fetch show details',
+      error: process.env.NODE_ENV === 'development' ? (error as Error).message : undefined,
+    });
   }
 };
+
+// Placeholder function to simulate fetching show details
+async function fetchShowDetailsFromService(id: string) {
+  // Simulate fetching data
+  return {
+    id,
+    title: 'Sample Show',
+    description: 'This is a sample show description.',
+    rating: 8.5,
+  };
+} 

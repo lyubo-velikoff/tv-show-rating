@@ -1,103 +1,70 @@
-# TV Show Ratings App
+# TV Show Ratings
 
-A web application for searching and rating TV shows using the OMDB API.
+A web application that combines ratings from IMDb, Viki, and MyDramaList.
 
-## Prerequisites
+## Features
 
-- Node.js (v18 or higher)
-- pnpm (v8 or higher)
-- OMDB API key (get one at http://www.omdbapi.com/apikey.aspx)
+- Search TV shows across multiple platforms
+- View combined ratings from IMDb, Viki, and MyDramaList
+- Dark mode support
+- Responsive design
 
-## Environment Setup
+## Tech Stack
 
-1. Client Setup:
+- Frontend:
+  - React with TypeScript
+  - Vite
+  - TailwindCSS
+  - HeadlessUI
+  - Axios
+
+- Backend:
+  - Node.js with TypeScript
+  - Express
+  - Cheerio for web scraping
+  - Node-Cache for caching
+
+## Setup
+
+1. Clone the repository
+2. Install dependencies:
    ```bash
-   cd client
-   cp .env.example .env
-   # Edit .env with your values
+   cd client && pnpm install
+   cd ../server && pnpm install
    ```
+3. Create environment files:
+   - `client/.env`:
+     ```
+     VITE_API_URL=http://localhost:5000
+     VITE_APP_NAME=TV Show Ratings
+     ```
+   - `server/.env`:
+     ```
+     NODE_ENV=development
+     PORT=5000
+     OMDB_API_KEY=your_omdb_api_key_here
+     VIKI_TOKEN=your_viki_token_here
+     CORS_ORIGIN=http://localhost:5173
+     ```
 
-2. Server Setup:
+4. Start development servers:
    ```bash
-   cd server
-   cp .env.example .env
-   # Edit .env with your values
+   ./dev.bat
    ```
-
-## Installation
-
-1. Install dependencies for both client and server:
+   Or manually:
    ```bash
-   # Install client dependencies
-   cd client
-   pnpm install
-
-   # Install server dependencies
-   cd ../server
-   pnpm install
+   cd client && pnpm dev
+   cd server && pnpm dev
    ```
 
 ## Development
 
-1. Start both applications using the development script:
-   ```bash
-   # From the root directory
-   ./dev.bat    # Windows
-   # OR
-   ./dev.sh     # Linux/Mac
-   ```
+- Frontend: http://localhost:5173
+- Backend: http://localhost:5000
 
-   This will start:
-   - Client at http://localhost:5173
-   - Server at http://localhost:5000
+## Building
 
-## Manual Start
-
-If you prefer to start the applications separately:
-
-1. Start the server:
-   ```bash
-   cd server
-   pnpm dev
-   ```
-
-2. Start the client:
-   ```bash
-   cd client
-   pnpm dev
-   ```
-
-### Required Environment Variables
-
-#### Client (.env)
-- `VITE_API_URL`: Backend API URL
-- `VITE_APP_NAME`: Application name
-
-#### Server (.env)
-- `PORT`: Server port number
-- `NODE_ENV`: Environment (development/production)
-- `OMDB_API_KEY`: Your OMDB API key (get one at http://www.omdbapi.com/apikey.aspx)
-- `VIKI_TOKEN`: Your Viki API token (temporary token, needs to be refreshed)
-- `CORS_ORIGIN`: Frontend URL for CORS
-
-## Features
-
-- Search TV shows using OMDB API
-- View show details including ratings
-- Dark/Light theme toggle
-- Responsive design
-- Pagination support
-
-## Tech Stack
-
-### Frontend
-- React with Vite
-- Tailwind CSS
-- Axios for API requests
-- Heroicons
-
-### Backend
-- Node.js
-- Express
-- OMDB API integration
-- Caching support
+```bash
+cd client && pnpm build
+cd server && pnpm build
+```

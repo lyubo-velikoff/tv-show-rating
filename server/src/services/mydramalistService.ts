@@ -6,10 +6,31 @@ const cache = new NodeCache({ stdTTL: 3600 }); // Cache for 1 hour
 
 const BASE_URL = 'https://mydramalist.com';
 
-export async function searchMyDramaList(query) {
+interface Show {
+  title: string;
+  url: string;
+  poster?: string;
+  rating: number;
+  year: string;
+  source: string;
+}
+
+interface ShowDetails {
+  title: string;
+  nativeName: string;
+  poster?: string;
+  rating: number;
+  synopsis: string;
+  genres: string[];
+  cast: { name: string; role: string }[];
+  aired: string;
+  status: string;
+}
+
+export async function searchMyDramaList(query: string): Promise<Show[]> {
   try {
     const cacheKey = `mdl_search_${query}`;
-    const cachedResult = cache.get(cacheKey);
+    const cachedResult = cache.get<Show[]>(cacheKey);
 
     if (cachedResult) {
       return cachedResult;
@@ -24,7 +45,7 @@ export async function searchMyDramaList(query) {
     });
 
     const $ = cheerio.load(response.data);
-    const shows = [];
+    const shows: Show[] = [];
 
     $('.box').each((_, element) => {
       const $element = $(element);
@@ -55,10 +76,10 @@ export async function searchMyDramaList(query) {
   }
 }
 
-export async function getShowDetails(url) {
+export async function getShowDetails(url: string): Promise<ShowDetails | null> {
   try {
     const cacheKey = `mdl_details_${url}`;
-    const cachedResult = cache.get(cacheKey);
+    const cachedResult = cache.get<ShowDetails>(cacheKey);
 
     if (cachedResult) {
       return cachedResult;
@@ -73,7 +94,7 @@ export async function getShowDetails(url) {
 
     const $ = cheerio.load(response.data);
 
-    const details = {
+    const details: ShowDetails = {
       title: $('h1.film-title').text().trim(),
       nativeName: $('.show-native-title').text().trim(),
       poster: $('.film-cover img').attr('src'),
@@ -98,4 +119,4 @@ export async function getShowDetails(url) {
     console.error('MyDramaList details scraping error:', error);
     return null;
   }
-}
+} 

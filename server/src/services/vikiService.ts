@@ -9,18 +9,25 @@ if (!VIKI_TOKEN) {
   throw new Error('VIKI_TOKEN is not defined in environment variables');
 }
 
-export async function searchViki(query) {
+interface VikiShow {
+  title: string;
+  vikiId: string;
+  rating: number;
+  source: 'Viki';
+  href: string;
+}
+
+export async function searchViki(query: string): Promise<VikiShow[]> {
   try {
     console.log('🔍 Searching Viki API for:', query);
     const cacheKey = `viki_search_${query}`;
-    const cachedResult = cache.get(cacheKey);
+    const cachedResult = cache.get<VikiShow[]>(cacheKey);
 
     if (cachedResult) {
       console.log('✅ Found cached Viki API results for:', query);
       return cachedResult;
     }
 
-    // Use Viki API
     const searchUrl = `${VIKI_API_URL}/search.json`;
     console.log('📡 Viki API Request:', {
       url: searchUrl,
@@ -49,25 +56,15 @@ export async function searchViki(query) {
       },
     });
 
-    const shows = [];
-
-    // Process API response
-    response.data.response.forEach((show) => {
-      if (show.type === 'series') {
-        shows.push({
-          title: show.titles.en,
-          vikiId: show.id,
-          poster: show.images?.poster?.url,
-          rating: show.review_stats?.average_rating || 0,
-          source: 'Viki',
-        });
-      }
-    });
-
-    console.log('📺 Processed Viki API response:', {
-      totalShows: response.data.response.length,
-      seriesFound: shows.length,
-    });
+    const shows = response.data.response
+      .filter((show: any) => show.type === 'series')
+      .map((show: any) => ({
+        title: show.titles.en,
+        vikiId: show.id,
+        rating: show.review_stats?.average_rating || 0,
+        source: 'Viki' as const,
+        href: `https://www.viki.com/tv/${show.id}`,
+      }));
 
     console.log('✅ Viki API results:', {
       query,
@@ -80,9 +77,9 @@ export async function searchViki(query) {
   } catch (error) {
     console.error('❌ Viki API error:', {
       query,
-      error: error.message,
-      status: error.response?.status,
+      error: (error as Error).message,
+      status: (error as any).response?.status,
     });
     return [];
   }
-}
+} 

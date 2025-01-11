@@ -1,10 +1,13 @@
-import React from 'react';
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
-import PropTypes from 'prop-types';
 import RatingWithLogo from './RatingWithLogo';
+import { Show } from '../types/show';
 
-export default function ShowCard({ show }) {
+interface ShowCardProps {
+  show: Show;
+}
+
+export default function ShowCard({ show }: ShowCardProps) {
   console.log('📺 Show data:', {
     title: show.title,
     vikiRating: show.vikiRating,
@@ -72,25 +75,4 @@ export default function ShowCard({ show }) {
       </div>
     </div>
   );
-}
-
-ShowCard.propTypes = {
-  show: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    title: PropTypes.string.isRequired,
-    description: PropTypes.string,
-    poster: PropTypes.string,
-    rating: PropTypes.number,
-    vikiRating: PropTypes.number,
-    vikiId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    mdlRating: PropTypes.number,
-    mdlId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]),
-    year: PropTypes.string,
-  }).isRequired,
-};
-
-RatingWithLogo.propTypes = {
-  source: PropTypes.oneOf(['IMDb', 'Viki']).isRequired,
-  rating: PropTypes.number,
-  url: PropTypes.string,
-}; 
+} 

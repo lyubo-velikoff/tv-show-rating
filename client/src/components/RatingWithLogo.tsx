@@ -1,15 +1,15 @@
-import PropTypes from 'prop-types';
+import { RatingProps } from '../types/show';
 import imdbLogo from '../assets/images/imdb-logo.js';
 import vikiLogo from '../assets/images/viki-logo.js';
 import mdlLogo from '../assets/images/mdl-logo.js';
 
-const LOGOS = {
+const LOGOS: Record<RatingProps['source'], string> = {
   IMDb: imdbLogo,
   Viki: vikiLogo,
   MDL: mdlLogo,
 };
 
-export default function RatingWithLogo({ source, rating, url }) {
+export default function RatingWithLogo({ source, rating, url }: RatingProps) {
   return (
     <div className="flex justify-between items-center">
       <div className="flex items-center gap-2">
@@ -20,7 +20,7 @@ export default function RatingWithLogo({ source, rating, url }) {
             source === 'IMDb' ? 'dark:brightness-[1.75] dark:contrast-[1.25]' : ''
           }`}
         />
-        {url && rating > 0 ? (
+        {url && rating && rating > 0 ? (
           <a
             href={url}
             target="_blank"
@@ -40,14 +40,8 @@ export default function RatingWithLogo({ source, rating, url }) {
         )}
       </div>
       <span className="text-sm font-semibold text-gray-900 dark:text-white">
-        {rating > 0 ? rating.toFixed(1) : 'N/A'}/10
+        {rating && rating > 0 ? rating.toFixed(1) : 'N/A'}/10
       </span>
     </div>
   );
-}
-
-RatingWithLogo.propTypes = {
-  source: PropTypes.oneOf(['IMDb', 'Viki', 'MDL']).isRequired,
-  rating: PropTypes.number,
-  url: PropTypes.string,
-}; 
+} 

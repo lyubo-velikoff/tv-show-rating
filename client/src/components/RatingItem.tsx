@@ -1,9 +1,15 @@
-import PropTypes from 'prop-types';
+import React from 'react';
 
-export default function RatingItem({ source, rating, url }) {
+interface RatingItemProps {
+  source: string;
+  rating?: number;
+  url?: string;
+}
+
+const RatingItem: React.FC<RatingItemProps> = ({ source, rating, url }) => {
   return (
     <div className="flex justify-between items-center">
-      {url && rating > 0 ? (
+      {url && rating && rating > 0 ? (
         <a
           href={url}
           target="_blank"
@@ -20,14 +26,10 @@ export default function RatingItem({ source, rating, url }) {
         <span className="text-sm text-gray-400 dark:text-gray-500">{source}</span>
       )}
       <span className="text-sm font-semibold text-gray-900 dark:text-white">
-        {rating > 0 ? rating.toFixed(1) : 'N/A'}/10
+        {rating && rating > 0 ? rating.toFixed(1) : 'N/A'}/10
       </span>
     </div>
   );
-}
+};
 
-RatingItem.propTypes = {
-  source: PropTypes.string.isRequired,
-  rating: PropTypes.number,
-  url: PropTypes.string,
-}; 
+export default RatingItem; 
