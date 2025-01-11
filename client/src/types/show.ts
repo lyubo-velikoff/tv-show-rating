@@ -6,6 +6,7 @@ export interface Show {
   rating: number;
   vikiRating: number;
   vikiId: string | number | null;
+  vikiHref: string | null;
   mdlRating: number;
   mdlId: string | number | null;
   mdlHref: string | null;

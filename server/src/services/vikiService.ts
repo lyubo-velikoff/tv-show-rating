@@ -9,12 +9,11 @@ if (!VIKI_TOKEN) {
   throw new Error('VIKI_TOKEN is not defined in environment variables');
 }
 
-interface VikiShow {
+export interface VikiShow {
+  id: string;
   title: string;
-  vikiId: string;
   rating: number;
-  source: 'Viki';
-  href: string;
+  href?: string;
 }
 
 export async function searchViki(query: string): Promise<VikiShow[]> {
@@ -60,10 +59,9 @@ export async function searchViki(query: string): Promise<VikiShow[]> {
       .filter((show: any) => show.type === 'series')
       .map((show: any) => ({
         title: show.titles.en,
-        vikiId: show.id,
+        vikiId: show.id.toString(),
         rating: show.review_stats?.average_rating || 0,
-        source: 'Viki' as const,
-        href: `https://www.viki.com/tv/${show.id}`,
+        href: `https://www.viki.com/tv/${show.id}v`,
       }));
 
     console.log('✅ Viki API results:', {

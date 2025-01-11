@@ -76,6 +76,7 @@ async function enrichShowWithDetails(show: IMDbShow): Promise<Show> {
     rating: details?.rating || 0,
     vikiRating: 0,
     vikiId: null,
+    vikiHref: null,
     mdlRating: 0,
     mdlId: null,
     mdlHref: null
@@ -172,6 +173,7 @@ export async function getIMDbDetails(imdbId: string): Promise<Show | null> {
       rating: rating,
       vikiRating: 0,
       vikiId: null,
+      vikiHref: null,
       mdlRating: 0,
       mdlId: null,
       mdlHref: null

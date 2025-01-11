@@ -5,9 +5,10 @@ export interface Show {
   poster?: string;
   rating: number;
   vikiRating: number;
-  vikiId: string | null;
+  vikiId: string | number | null;
+  vikiHref: string | null;
   mdlRating: number;
-  mdlId: string | null;
+  mdlId: string | number | null;
   mdlHref: string | null;
   year?: string;
 }

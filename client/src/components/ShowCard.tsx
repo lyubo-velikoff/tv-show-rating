@@ -64,7 +64,7 @@ const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
           <RatingWithLogo
             source="Viki"
             rating={show.vikiRating}
-            url={show.vikiId ? `https://www.viki.com/tv/${show.vikiId}` : undefined}
+            url={show.vikiHref || undefined}
           />
           <RatingWithLogo
             source="MDL"

@@ -28,18 +28,23 @@ A web application that combines ratings from IMDb, Viki, and MyDramaList.
 
 1. Clone the repository
 2. Install dependencies:
+
    ```bash
    cd client && pnpm install
    cd ../server && pnpm install
    ```
+
 3. Create environment files:
    - `client/.env`:
-     ```
+
+     ```env
      VITE_API_URL=http://localhost:5000
      VITE_APP_NAME=TV Show Ratings
      ```
+
    - `server/.env`:
-     ```
+
+     ```env
      NODE_ENV=development
      PORT=5000
      OMDB_API_KEY=your_omdb_api_key_here
@@ -48,10 +53,13 @@ A web application that combines ratings from IMDb, Viki, and MyDramaList.
      ```
 
 4. Start development servers:
+
    ```bash
    ./dev.bat
    ```
+
    Or manually:
+
    ```bash
    cd client && pnpm dev
    cd server && pnpm dev
@@ -59,8 +67,8 @@ A web application that combines ratings from IMDb, Viki, and MyDramaList.
 
 ## Development
 
-- Frontend: http://localhost:5173
-- Backend: http://localhost:5000
+- Frontend: <http://localhost:5173>
+- Backend: <http://localhost:5000>
 
 ## Building
 

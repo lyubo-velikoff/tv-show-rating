@@ -1,7 +1,7 @@
 import { Request, Response } from 'express';
 import { searchIMDb } from '../services/apiServices';
-import { searchViki } from '../services/vikiService';
-import { searchMDL } from '../services/mdlService';
+import { searchViki, VikiShow } from '../services/vikiService';
+import { searchMDL, MDLShow } from '../services/mdlService';
 import { cacheService } from '../services/cacheService';
 import { SearchResponse, Show } from '../types/show';
 
@@ -15,24 +15,48 @@ function normalizeTitle(title: string): string {
 }
 
 // Add helper function for title similarity
+function isExactMatch(normalized1: string, normalized2: string): boolean {
+  return normalized1 === normalized2;
+}
+
+function isSubstring(normalized1: string, normalized2: string): boolean {
+  return normalized1.includes(normalized2) || normalized2.includes(normalized1);
+}
+
+function calculateWordSimilarity(normalized1: string, normalized2: string): number {
+  const words1 = normalized1.split(' ');
+  const words2 = normalized2.split(' ');
+  const commonWords = words1.filter(word => words2.includes(word));
+  return commonWords.length / Math.min(words1.length, words2.length);
+}
+
 function areTitlesSimilar(title1: string, title2: string): boolean {
   const normalized1 = normalizeTitle(title1);
   const normalized2 = normalizeTitle(title2);
 
-  // Check exact match after normalization
-  if (normalized1 === normalized2) return true;
+  return isExactMatch(normalized1, normalized2) ||
+         isSubstring(normalized1, normalized2) ||
+         calculateWordSimilarity(normalized1, normalized2) > 0.5;
+}
 
-  // Check if one title contains the other
-  if (normalized1.includes(normalized2) || normalized2.includes(normalized1)) return true;
+function findMatchingVikiShow(sourceShow: Show, vikiShows: VikiShow[]): VikiShow | undefined {
+  return vikiShows.find(show => areTitlesSimilar(show.title, sourceShow.title));
+}
 
-  // Check if titles share significant words
-  const words1 = normalized1.split(' ');
-  const words2 = normalized2.split(' ');
-  const commonWords = words1.filter(word => words2.includes(word));
-  
-  // If titles share more than 50% of their words, consider them similar
-  const similarity = commonWords.length / Math.min(words1.length, words2.length);
-  return similarity > 0.5;
+function findMatchingMDLShow(sourceShow: Show, mdlShows: MDLShow[]): MDLShow | undefined {
+  return mdlShows.find(show => areTitlesSimilar(show.title, sourceShow.title));
+}
+
+function enrichShowWithRatings(imdbShow: Show, vikiShow?: VikiShow, mdlShow?: MDLShow): Show {
+  return {
+    ...imdbShow,
+    vikiRating: vikiShow?.rating || 0,
+    vikiId: vikiShow?.id ? vikiShow.id.toString() : null,
+    vikiHref: vikiShow?.href || null,
+    mdlRating: mdlShow?.rating || 0,
+    mdlId: mdlShow?.id || null,
+    mdlHref: mdlShow?.href || null,
+  };
 }
 
 export const searchShows = async (req: Request, res: Response) => {
@@ -44,73 +68,31 @@ export const searchShows = async (req: Request, res: Response) => {
     }
 
     const cacheKey = `${query}_page${page}`;
-
-    // Check cache first
     const cachedResults = cacheService.get<SearchResponse>(cacheKey);
     if (cachedResults) {
       return res.json(cachedResults);
     }
 
-    // Fetch results from all sources
     const [imdbResults, vikiResults, mdlResults] = await Promise.all([
       searchIMDb(query, Number(page)),
       searchViki(query),
       searchMDL(query),
     ]);
 
-    // Match shows from both sources by title similarity
-    const combinedShows = imdbResults.shows.map((imdbShow) => {
-      const vikiShow = vikiResults.find(
-        (vs) => areTitlesSimilar(vs.title, imdbShow.title)
-      );
-
-      const mdlShow = mdlResults.find(
-        (ms) => areTitlesSimilar(ms.title, imdbShow.title)
-      );
-
-      console.log('🔍 Matching shows:', {
-        imdbTitle: imdbShow.title,
-        vikiShow: vikiShow
-          ? {
-              title: vikiShow.title,
-              rating: vikiShow.rating,
-              vikiId: vikiShow.vikiId,
-            }
-          : 'No match',
-        mdlShow: mdlShow
-          ? {
-              title: mdlShow.title,
-              rating: mdlShow.rating,
-              mdlId: mdlShow.mdlId,
-            }
-          : 'No match',
-      });
-
-      return {
-        ...imdbShow,
-        vikiRating: vikiShow?.rating || 0,
-        vikiId: vikiShow?.vikiId || null,
-        mdlRating: mdlShow?.rating || 0,
-        mdlId: mdlShow?.mdlId || null,
-        mdlHref: mdlShow?.href || null,
-      };
+    const combinedShows = imdbResults.shows.map(imdbShow => {
+      const vikiShow = findMatchingVikiShow(imdbShow, vikiResults);
+      const mdlShow = findMatchingMDLShow(imdbShow, mdlResults);
+      return enrichShowWithRatings(imdbShow, vikiShow, mdlShow);
     });
 
-    // Filter out results with missing posters or titles
-    const validResults = combinedShows.filter(
-      (show): show is Show => Boolean(show.title && show.poster)
-    );
-
     const response: SearchResponse = {
-      shows: validResults,
-      totalResults: Number(imdbResults.totalResults),
+      shows: combinedShows,
+      totalResults: imdbResults.totalResults,
       currentPage: Number(page),
-      totalPages: Math.ceil(Number(imdbResults.totalResults) / 10),
+      totalPages: Math.ceil(imdbResults.totalResults / 10),
     };
 
-    // Cache results
     cacheService.set(cacheKey, response);
-
     res.json(response);
   } catch (error) {
     console.error('Search error:', error);
