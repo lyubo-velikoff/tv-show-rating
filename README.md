@@ -77,6 +77,7 @@ If you prefer to start the applications separately:
 - `PORT`: Server port number
 - `NODE_ENV`: Environment (development/production)
 - `OMDB_API_KEY`: Your OMDB API key (get one at http://www.omdbapi.com/apikey.aspx)
+- `VIKI_TOKEN`: Your Viki API token (temporary token, needs to be refreshed)
 - `CORS_ORIGIN`: Frontend URL for CORS
 
 ## Features
