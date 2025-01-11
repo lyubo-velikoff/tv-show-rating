@@ -1,0 +1,47 @@
+tv-show-ratings/
+├── dev.bat
+├── dev.ps1
+├── .gitignore
+├── .prettierrc
+├── .nvmrc
+├── pnpm-workspace.yaml
+├── client/
+│   ├── .env
+│   ├── .eslintrc.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── tailwind.config.js
+│   ├── public/
+│   └── src/
+│       ├── components/
+│       │   ├── LoadingSpinner.jsx
+│       │   ├── Navbar.jsx
+│       │   ├── Pagination.jsx
+│       │   ├── SearchBar.jsx
+│       │   ├── ShowCard.jsx
+│       │   └── ShowGrid.jsx
+│       ├── hooks/
+│       ├── context/
+│       │   └── ThemeContext.jsx
+│       ├── services/
+│       │   └── api.js
+│       └── styles/
+│           └── index.css
+└── server/
+    ├── .env
+    ├── .eslintrc.json
+    ├── package.json
+    ├── src/
+    │   ├── controllers/
+    │   │   └── showController.js
+    │   ├── services/
+    │   │   ├── apiServices.js
+    │   │   ├── cacheService.js
+    │   │   └── mydramalistService.js
+    │   ├── models/
+    │   ├── routes/
+    │   │   └── shows.js
+    │   ├── utils/
+    │   │   └── resultsCombiner.js
+    │   └── index.js
+    └── config/ 
