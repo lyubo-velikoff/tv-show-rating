@@ -11,18 +11,21 @@ if (!VIKI_TOKEN) {
 
 export async function searchViki(query) {
   try {
-    console.log('🔍 Searching Viki for:', query);
+    console.log('🔍 Searching Viki API for:', query);
     const cacheKey = `viki_search_${query}`;
     const cachedResult = cache.get(cacheKey);
 
     if (cachedResult) {
-      console.log('✅ Found cached Viki results for:', query);
+      console.log('✅ Found cached Viki API results for:', query);
       return cachedResult;
     }
 
     // Use Viki API
     const searchUrl = `${VIKI_API_URL}/search.json`;
-    console.log('📡 Viki Search URL:', searchUrl);
+    console.log('📡 Viki API Request:', {
+      url: searchUrl,
+      term: query,
+    });
 
     const response = await axios.get(searchUrl, {
       params: {
@@ -61,9 +64,12 @@ export async function searchViki(query) {
       }
     });
 
-    console.log('📺 Found Viki shows:', shows);
+    console.log('📺 Processed Viki API response:', {
+      totalShows: response.data.response.length,
+      seriesFound: shows.length,
+    });
 
-    console.log('✅ Viki search results:', {
+    console.log('✅ Viki API results:', {
       query,
       resultsCount: shows.length,
       shows,
@@ -72,7 +78,7 @@ export async function searchViki(query) {
     cache.set(cacheKey, shows);
     return shows;
   } catch (error) {
-    console.error('❌ Viki scraping error:', {
+    console.error('❌ Viki API error:', {
       query,
       error: error.message,
       status: error.response?.status,
