@@ -2,7 +2,7 @@ import React from 'react';
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { useState } from 'react';
 import PropTypes from 'prop-types';
-import RatingItem from './RatingItem';
+import RatingWithLogo from './RatingWithLogo';
 
 export default function ShowCard({ show }) {
   console.log('📺 Show data:', {
@@ -53,12 +53,12 @@ export default function ShowCard({ show }) {
           {show.description}
         </p>
         <div className="mt-4 space-y-2">
-          <RatingItem
+          <RatingWithLogo
             source="IMDb"
             rating={show.rating}
             url={`https://www.imdb.com/title/${show.id}`}
           />
-          <RatingItem
+          <RatingWithLogo
             source="Viki"
             rating={show.vikiRating}
             url={show.vikiId ? `https://www.viki.com/tv/${show.vikiId}` : undefined}
@@ -82,8 +82,8 @@ ShowCard.propTypes = {
   }).isRequired,
 };
 
-RatingItem.propTypes = {
-  source: PropTypes.string.isRequired,
+RatingWithLogo.propTypes = {
+  source: PropTypes.oneOf(['IMDb', 'Viki']).isRequired,
   rating: PropTypes.number,
-  url: PropTypes.string
+  url: PropTypes.string,
 }; 
