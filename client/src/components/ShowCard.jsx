@@ -20,9 +20,14 @@ export default function ShowCard({ show }) {
       />
       <div className="p-4">
         <div className="flex justify-between items-start">
-          <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+          <a
+            href={`https://www.imdb.com/title/${show.id}`}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-lg font-semibold text-gray-900 dark:text-white hover:text-blue-600 dark:hover:text-blue-400"
+          >
             {show.title}
-          </h3>
+          </a>
           <button
             onClick={toggleFavorite}
             className={`${
