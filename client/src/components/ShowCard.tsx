@@ -1,5 +1,5 @@
+import React, { useState } from 'react';
 import { HeartIcon } from '@heroicons/react/24/outline';
-import { useState } from 'react';
 import RatingWithLogo from './RatingWithLogo';
 import { Show } from '../types/show';
 
@@ -7,7 +7,7 @@ interface ShowCardProps {
   show: Show;
 }
 
-export default function ShowCard({ show }: ShowCardProps) {
+const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
   console.log('📺 Show data:', {
     title: show.title,
     vikiRating: show.vikiRating,
@@ -75,4 +75,6 @@ export default function ShowCard({ show }: ShowCardProps) {
       </div>
     </div>
   );
-} 
+};
+
+export default React.memo(ShowCard); 
