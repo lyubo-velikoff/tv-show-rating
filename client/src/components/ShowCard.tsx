@@ -3,9 +3,11 @@ import { Show } from '../types/show';
 
 interface ShowCardProps {
   show: Show;
+  isFavorite: boolean;
+  onFavoriteChange: (isFavorite: boolean) => void;
 }
 
-const ShowCard = ({ show }: ShowCardProps) => {
+const ShowCard = ({ show, isFavorite, onFavoriteChange }: ShowCardProps) => {
   const [searchParams] = useSearchParams();
   const searchQuery = searchParams.get('q');
   const searchPage = searchParams.get('page');
@@ -41,6 +43,15 @@ const ShowCard = ({ show }: ShowCardProps) => {
           </div>
         </div>
       </Link>
+      <button
+        onClick={(e) => {
+          e.preventDefault();
+          onFavoriteChange(!isFavorite);
+        }}
+        className="absolute top-2 right-2 text-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-200 z-10 p-2 hover:scale-110 transform"
+      >
+        {isFavorite ? '❤️' : '🤍'}
+      </button>
     </div>
   );
 };

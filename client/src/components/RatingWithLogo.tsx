@@ -34,17 +34,18 @@ const RatingWithLogo = ({ source, rating, url }: RatingWithLogoProps) => {
   const Content = () => (
     <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg p-2 shadow-sm">
       <img src={getLogo()} alt={getAlt()} className="h-6 object-contain" />
-      <span className="font-semibold">{rating.toFixed(1)}</span>
+      <span className="font-semibold">{rating ? `${rating.toFixed(1)}/10` : 'N/A'}</span>
     </div>
   );
 
-  if (url) {
+  if (url && rating > 0) {
     return (
       <a 
         href={url} 
         target="_blank" 
         rel="noopener noreferrer"
         className="hover:opacity-80 transition-opacity duration-200"
+        title={`View on ${source}`}
       >
         <Content />
       </a>

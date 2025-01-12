@@ -1,13 +1,15 @@
 import { useState, useEffect, useCallback } from 'react';
 import { BrowserRouter, Routes, Route, useSearchParams } from 'react-router-dom';
 import { Show } from './types/show';
-import { searchShows } from './services/api';
+import { searchShows, getFavorites, addToFavorites, removeFromFavorites } from './services/api';
 import SearchBar from './components/SearchBar';
 import ShowGrid from './components/ShowGrid';
 import ShowDetails from './components/ShowDetails';
 import Pagination from './components/Pagination';
 import LoadingSpinner from './components/LoadingSpinner';
 import { ThemeToggle } from './components/ThemeToggle';
+import FavoritesButton from './components/FavoritesButton';
+import FavoritesPage from './components/FavoritesPage';
 
 const SearchPage = () => {
   const [searchParams, setSearchParams] = useSearchParams();
@@ -18,6 +20,18 @@ const SearchPage = () => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [totalPages, setTotalPages] = useState(0);
+  const [favorites, setFavorites] = useState<string[]>([]);
+
+  // Load favorites on mount
+  useEffect(() => {
+    getFavorites()
+      .then(favShows => {
+        setFavorites(favShows.map(show => show.id));
+      })
+      .catch(error => {
+        console.error('Error fetching favorites:', error);
+      });
+  }, []);
 
   useEffect(() => {
     const performSearch = async () => {
@@ -58,6 +72,26 @@ const SearchPage = () => {
     setSearchParams({ q: query, page: newPage.toString() });
   }, [query, setSearchParams]);
 
+  const handleFavoriteChange = async (show: Show, isFavorite: boolean) => {
+    try {
+      if (isFavorite) {
+        await addToFavorites(show);
+        setFavorites(prev => [...prev, show.id]);
+      } else {
+        await removeFromFavorites(show.id);
+        setFavorites(prev => prev.filter(id => id !== show.id));
+      }
+    } catch (err) {
+      console.error('Error updating favorites:', err);
+      // Revert the optimistic update
+      if (isFavorite) {
+        setFavorites(prev => prev.filter(id => id !== show.id));
+      } else {
+        setFavorites(prev => [...prev, show.id]);
+      }
+    }
+  };
+
   return (
     <div className="container mx-auto px-4 py-8">
       <SearchBar onSearch={handleSearch} initialQuery={query} />
@@ -68,7 +102,22 @@ const SearchPage = () => {
         <LoadingSpinner />
       ) : (
         <>
-          <ShowGrid shows={shows} />
+          <ShowGrid 
+            shows={shows} 
+            favorites={favorites}
+            setFavorites={(newFavorites) => {
+              const added = newFavorites.find(id => !favorites.includes(id));
+              const removed = favorites.find(id => !newFavorites.includes(id));
+              
+              if (added) {
+                const show = shows.find(s => s.id === added);
+                if (show) handleFavoriteChange(show, true);
+              } else if (removed) {
+                const show = shows.find(s => s.id === removed);
+                if (show) handleFavoriteChange(show, false);
+              }
+            }}
+          />
           {totalPages > 1 && (
             <div className="mt-8">
               <Pagination
@@ -91,7 +140,9 @@ const App = () => {
         <Routes>
           <Route path="/" element={<SearchPage />} />
           <Route path="/show/:id" element={<ShowDetails />} />
+          <Route path="/favorites" element={<FavoritesPage />} />
         </Routes>
+        <FavoritesButton />
         <ThemeToggle />
       </div>
     </BrowserRouter>
