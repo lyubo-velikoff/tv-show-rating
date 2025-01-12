@@ -38,7 +38,7 @@ A web application that combines ratings from IMDb, Viki, and MyDramaList.
    - `client/.env`:
 
      ```env
-     VITE_API_URL=http://localhost:5000
+     VITE_API_URL=http://localhost:3000
      VITE_APP_NAME=TV Show Ratings
      ```
 
@@ -46,7 +46,7 @@ A web application that combines ratings from IMDb, Viki, and MyDramaList.
 
      ```env
      NODE_ENV=development
-     PORT=5000
+     PORT=3000
      OMDB_API_KEY=your_omdb_api_key_here
      VIKI_TOKEN=your_viki_token_here
      CORS_ORIGIN=http://localhost:5173
@@ -68,7 +68,7 @@ A web application that combines ratings from IMDb, Viki, and MyDramaList.
 ## Development
 
 - Frontend: <http://localhost:5173>
-- Backend: <http://localhost:5000>
+- Backend: <http://localhost:3000>
 
 ## Building
 
