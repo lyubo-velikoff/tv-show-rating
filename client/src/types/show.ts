@@ -4,12 +4,12 @@ export interface Show {
   description?: string;
   poster?: string;
   rating: number;
-  vikiRating: number;
-  vikiId: string | number | null;
-  vikiHref: string | null;
-  mdlRating: number;
-  mdlId: string | number | null;
-  mdlHref: string | null;
+  vikiRating?: number;
+  vikiId?: string | number | null;
+  vikiHref?: string | null;
+  mdlRating?: number;
+  mdlId?: string | number | null;
+  mdlHref?: string | null;
   year?: string;
 }
 

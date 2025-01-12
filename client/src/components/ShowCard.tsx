@@ -1,78 +1,46 @@
-import React from 'react';
-import { HeartIcon } from '@heroicons/react/24/outline';
+import { Link, useSearchParams } from 'react-router-dom';
 import { Show } from '../types/show';
-import imdbLogo from '../assets/images/imdb.webp';
-import vikiLogo from '../assets/images/viki.png';
-import mdlLogo from '../assets/images/mydramalist.png';
-import { addFavorite, removeFavorite } from '../services/api';
 
 interface ShowCardProps {
   show: Show;
-  isFavorite: boolean;
-  onFavoriteChange: (isFavorite: boolean) => void;
 }
 
-const ShowCard: React.FC<ShowCardProps> = ({ show, isFavorite, onFavoriteChange }) => {
-  const toggleFavorite = async () => {
-    try {
-      if (isFavorite) {
-        await removeFavorite(show.id);
-        onFavoriteChange(false);
-      } else {
-        await addFavorite(show);
-        onFavoriteChange(true);
-      }
-    } catch (error) {
-      console.error('Error toggling favorite:', error);
-    }
+const ShowCard = ({ show }: ShowCardProps) => {
+  const [searchParams] = useSearchParams();
+  const searchQuery = searchParams.get('q');
+  const searchPage = searchParams.get('page');
+
+  const detailsLink = () => {
+    const params = new URLSearchParams();
+    if (searchQuery) params.set('q', searchQuery);
+    if (searchPage) params.set('page', searchPage);
+    return `/show/${show.id}?${params.toString()}`;
   };
 
   return (
-    <div className="relative overflow-hidden bg-white rounded-lg shadow-lg dark:bg-gray-800 min-h-[700px] transform transition-transform duration-300 hover:scale-105">
-      <img
-        src={show.poster}
-        alt={show.title}
-        className="absolute inset-0 object-cover w-full h-full"
-      />
-      <div className="absolute inset-0 bg-gradient-to-t from-black via-transparent to-transparent"></div>
-      <div className="absolute bottom-0 w-full p-4 text-white bg-black bg-opacity-50">
-        <button
-          onClick={toggleFavorite}
-          className={`absolute top-2 right-2 p-1 rounded-full bg-black/50 backdrop-blur-sm ${
-            isFavorite ? 'text-red-500' : 'text-white'
-          } hover:text-red-500`}
-        >
-          <HeartIcon className="w-5 h-5" />
-        </button>
-        <a
-          href={`https://www.imdb.com/title/${show.id}`}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="font-semibold text-md hover:text-blue-600 dark:hover:text-blue-400 line-clamp-2"
-        >
-          {show.title}
-        </a>
-        <div className="text-xs text-gray-300">
-          {show.year}
+    <div className="relative group">
+      <Link to={detailsLink()}>
+        <div className="relative aspect-[2/3] overflow-hidden rounded-lg">
+          {show.poster ? (
+            <img
+              src={show.poster}
+              alt={show.title}
+              className="w-full h-full object-cover transition-transform duration-300 group-hover:scale-105"
+            />
+          ) : (
+            <div className="w-full h-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center">
+              <span className="text-gray-400 dark:text-gray-500">No Image</span>
+            </div>
+          )}
+          <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/40 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+          <div className="absolute bottom-0 left-0 right-0 p-4 text-white transform translate-y-full group-hover:translate-y-0 transition-transform duration-300">
+            <h3 className="text-lg font-semibold truncate">{show.title}</h3>
+            {show.year && (
+              <p className="text-sm text-gray-300">{show.year}</p>
+            )}
+          </div>
         </div>
-        <p className="mt-1 text-xs line-clamp-3">
-          {show.description}
-        </p>
-        <div className="flex mt-2 space-x-2">
-          <a href={`https://www.imdb.com/title/${show.id}`} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1">
-            <img src={imdbLogo} alt="IMDb" className="w-10 h-10" />
-            <span className="text-xs">{show.rating}/10</span>
-          </a>
-          <a href={show.vikiHref || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1">
-            <img src={vikiLogo} alt="Viki" className="w-10 h-10" />
-            <span className="text-xs">{show.vikiRating}/10</span>
-          </a>
-          <a href={show.mdlHref || '#'} target="_blank" rel="noopener noreferrer" className="flex items-center space-x-1">
-            <img src={mdlLogo} alt="MDL" className="w-10 h-10" />
-            <span className="text-xs">{show.mdlRating}/10</span>
-          </a>
-        </div>
-      </div>
+      </Link>
     </div>
   );
 };

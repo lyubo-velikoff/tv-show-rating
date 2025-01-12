@@ -1,57 +1,34 @@
-import React, { useCallback, useEffect, useState } from 'react';
-import { searchShows } from '../services/api';
+import { useState, useEffect } from 'react';
+import { useDebounce } from '../hooks/useDebounce';
 
 interface SearchBarProps {
-  onSearchResults: (results: any) => void;
-  onLoading: (loading: boolean) => void;
-  currentPage: number;
-  onError: (error: string) => void;
+  onSearch: (query: string) => void;
+  initialQuery?: string;
 }
 
-const SearchBar: React.FC<SearchBarProps> = ({ onSearchResults, onLoading, currentPage, onError }) => {
-  const [query, setQuery] = useState('');
-  const [debouncedQuery, setDebouncedQuery] = useState('');
+const SearchBar = ({ onSearch, initialQuery = '' }: SearchBarProps) => {
+  const [query, setQuery] = useState(initialQuery);
+  const debouncedQuery = useDebounce(query, 300);
 
-  const handleSearch = useCallback(async () => {
-    if (!debouncedQuery.trim()) {
-      onSearchResults({ shows: [], currentPage: 1, totalPages: 0 });
-      return;
-    }
-    
-    onLoading(true);
-    try {
-      const results = await searchShows(debouncedQuery, currentPage);
-      onSearchResults(results);
-    } catch (error) {
-      console.error('Search error:', error);
-      onError(error instanceof Error ? error.message : 'An error occurred while searching');
-    } finally {
-      onLoading(false);
-    }
-  }, [debouncedQuery, currentPage, onSearchResults, onLoading, onError]);
-
-  // Debounce the query
   useEffect(() => {
-    const timer = setTimeout(() => {
-      setDebouncedQuery(query);
-    }, 500);
+    if (debouncedQuery !== initialQuery) {
+      onSearch(debouncedQuery);
+    }
+  }, [debouncedQuery, onSearch, initialQuery]);
 
-    return () => clearTimeout(timer);
-  }, [query]);
-
-  // Trigger search when debounced query changes
+  // Update local state when initialQuery changes
   useEffect(() => {
-    handleSearch();
-  }, [debouncedQuery, currentPage]); // Remove handleSearch from dependencies
+    setQuery(initialQuery);
+  }, [initialQuery]);
 
   return (
-    <div className="mx-auto mb-8 w-full max-w-xl">
+    <div className="mx-auto mb-4 w-full max-w-xl">
       <input
         type="text"
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         placeholder="Search for TV shows..."
-        className="px-4 py-2 w-full text-gray-700 bg-white rounded-lg border border-gray-300 dark:bg-gray-800 dark:text-white dark:border-gray-700 focus:outline-none focus:border-blue-500"
+        className="w-full px-4 py-2 text-gray-900 bg-white border border-gray-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent dark:bg-gray-800 dark:border-gray-700 dark:text-white dark:focus:ring-blue-400"
       />
     </div>
   );

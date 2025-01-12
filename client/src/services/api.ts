@@ -7,7 +7,7 @@ const api = axios.create({
 
 export async function searchShows(query: string, page: number = 1): Promise<SearchResponse> {
   try {
-    const response = await api.get<SearchResponse>(`/api/shows/tmdb/${encodeURIComponent(query)}`);
+    const response = await api.get<SearchResponse>(`/api/shows/tmdb/${encodeURIComponent(query)}?page=${page}`);
     return response.data;
   } catch (error) {
     console.error('API Error:', error);
@@ -15,13 +15,24 @@ export async function searchShows(query: string, page: number = 1): Promise<Sear
   }
 }
 
-export async function getShowDetails(id: string): Promise<Show | null> {
+export async function getShowDetails(id: string): Promise<Show> {
   try {
-    const response = await api.get<Show>(`/api/shows/${id}`);
-    return response.data;
+    const [tmdbResponse, vikiResponse, mdlResponse] = await Promise.all([
+      api.get<Show>(`/api/shows/tmdb/details/${id}`),
+      api.get<{ rating: number; href: string }>(`/api/shows/viki/${id}`).catch(() => null),
+      api.get<{ rating: number; href: string }>(`/api/shows/mdl/${id}`).catch(() => null)
+    ]);
+
+    return {
+      ...tmdbResponse.data,
+      vikiRating: vikiResponse?.data.rating,
+      vikiHref: vikiResponse?.data.href,
+      mdlRating: mdlResponse?.data.rating,
+      mdlHref: mdlResponse?.data.href
+    };
   } catch (error) {
     console.error('API Error:', error);
-    return null;
+    throw error;
   }
 }
 

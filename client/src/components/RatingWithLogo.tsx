@@ -1,47 +1,57 @@
-import { RatingProps } from '../types/show';
-import imdbLogo from '../assets/images/imdb-logo.js';
-import vikiLogo from '../assets/images/viki-logo.js';
-import mdlLogo from '../assets/images/mdl-logo.js';
+import vikiLogo from '../assets/images/viki.png';
+import imdbLogo from '../assets/images/imdb.webp';
+import mdlLogo from '../assets/images/mydramalist.png';
 
-const LOGOS: Record<RatingProps['source'], string> = {
-  IMDb: imdbLogo,
-  Viki: vikiLogo,
-  MDL: mdlLogo,
-};
+interface RatingWithLogoProps {
+  source: 'IMDb' | 'Viki' | 'MDL';
+  rating: number;
+  url?: string;
+}
 
-export default function RatingWithLogo({ source, rating, url }: RatingProps) {
-  return (
-    <div className="flex justify-between items-center">
-      <div className="flex gap-2 items-center">
-        <img
-          src={LOGOS[source]}
-          alt={`${source} logo`}
-          className={`w-10 h-10 object-contain ${
-            source === 'IMDb' ? 'dark:brightness-[1.75] dark:contrast-[1.25]' : ''
-          }`}
-        />
-        {url && rating && rating > 0 ? (
-          <a
-            href={url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className={`text-sm ${
-              rating > 0
-                ? 'text-gray-600 dark:text-gray-400 hover:text-blue-600 dark:hover:text-blue-400'
-                : 'text-gray-400 dark:text-gray-500 cursor-default'
-            }`}
-          >
-            {source}
-          </a>
-        ) : (
-          <span className="text-sm text-gray-400 dark:text-gray-500">
-            {source}
-          </span>
-        )}
-      </div>
-      <span className="text-sm font-semibold text-gray-900 dark:text-white">
-        {rating && rating > 0 ? rating.toFixed(1) : 'N/A'}/10
-      </span>
+const RatingWithLogo = ({ source, rating, url }: RatingWithLogoProps) => {
+  const getLogo = () => {
+    switch (source) {
+      case 'IMDb':
+        return imdbLogo;
+      case 'Viki':
+        return vikiLogo;
+      case 'MDL':
+        return mdlLogo;
+    }
+  };
+
+  const getAlt = () => {
+    switch (source) {
+      case 'IMDb':
+        return 'IMDb Rating';
+      case 'Viki':
+        return 'Viki Rating';
+      case 'MDL':
+        return 'MyDramaList Rating';
+    }
+  };
+
+  const Content = () => (
+    <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg p-2 shadow-sm">
+      <img src={getLogo()} alt={getAlt()} className="h-6 object-contain" />
+      <span className="font-semibold">{rating.toFixed(1)}</span>
     </div>
   );
-} 
+
+  if (url) {
+    return (
+      <a 
+        href={url} 
+        target="_blank" 
+        rel="noopener noreferrer"
+        className="hover:opacity-80 transition-opacity duration-200"
+      >
+        <Content />
+      </a>
+    );
+  }
+
+  return <Content />;
+};
+
+export default RatingWithLogo; 
