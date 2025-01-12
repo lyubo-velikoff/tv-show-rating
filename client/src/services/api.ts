@@ -7,9 +7,7 @@ const api = axios.create({
 
 export async function searchShows(query: string, page: number = 1): Promise<SearchResponse> {
   try {
-    const response = await api.get<SearchResponse>(
-      `/api/shows/search?query=${query}&page=${page}`
-    );
+    const response = await api.get<SearchResponse>(`/api/shows/tmdb/${encodeURIComponent(query)}`);
     return response.data;
   } catch (error) {
     console.error('API Error:', error);

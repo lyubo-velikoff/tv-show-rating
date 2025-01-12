@@ -1,40 +1,29 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import { HeartIcon } from '@heroicons/react/24/outline';
 import { Show } from '../types/show';
 import imdbLogo from '../assets/images/imdb.webp';
 import vikiLogo from '../assets/images/viki.png';
 import mdlLogo from '../assets/images/mydramalist.png';
-import { getFavorites, addFavorite, removeFavorite } from '../services/api';
+import { addFavorite, removeFavorite } from '../services/api';
 
 interface ShowCardProps {
   show: Show;
+  isFavorite: boolean;
+  onFavoriteChange: (isFavorite: boolean) => void;
 }
 
-const ShowCard: React.FC<ShowCardProps> = ({ show }) => {
-  const [isFavorite, setIsFavorite] = useState(false);
-
-  useEffect(() => {
-    // Check if the show is already in favorites
-    getFavorites().then(favorites => {
-      setIsFavorite(favorites.some((fav: any) => fav.id === show.id));
-    }).catch(error => {
-      console.error('Error fetching favorites:', error);
-    });
-  }, [show.id]);
-
-  const toggleFavorite = () => {
-    if (isFavorite) {
-      removeFavorite(show.id).then(() => {
-        setIsFavorite(false);
-      }).catch(error => {
-        console.error('Error removing favorite:', error);
-      });
-    } else {
-      addFavorite(show).then(() => {
-        setIsFavorite(true);
-      }).catch(error => {
-        console.error('Error adding favorite:', error);
-      });
+const ShowCard: React.FC<ShowCardProps> = ({ show, isFavorite, onFavoriteChange }) => {
+  const toggleFavorite = async () => {
+    try {
+      if (isFavorite) {
+        await removeFavorite(show.id);
+        onFavoriteChange(false);
+      } else {
+        await addFavorite(show);
+        onFavoriteChange(true);
+      }
+    } catch (error) {
+      console.error('Error toggling favorite:', error);
     }
   };
 
