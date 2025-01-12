@@ -15,7 +15,7 @@ const App = () => {
   };
 
   return (
-    <div className="min-h-screen text-gray-900 bg-white transition-colors duration-200 dark:bg-gray-900 dark:text-white">
+    <div className="min-h-screen text-gray-900 transition-colors duration-200 bg-white dark:bg-gray-900 dark:text-white">
       <div className="container px-4 py-8 mx-auto">
         <SearchBar
           onSearchResults={handleSearchResults}

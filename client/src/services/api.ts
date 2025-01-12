@@ -54,3 +54,13 @@ export async function removeFavorite(id: string): Promise<void> {
     throw error;
   }
 }
+
+export async function searchTmdbShows(query: string): Promise<Show[]> {
+  try {
+    const response = await api.get<Show[]>(`/api/shows/tmdb/${query}`);
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}

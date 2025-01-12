@@ -1,9 +1,11 @@
-import express, { Request, Response } from 'express';
+import express from 'express';
 import { searchShows, getShowDetails } from '../controllers/showController';
+import { searchTmdbShowsEndpoint } from '../controllers/searchTmdb';
 
 const router = express.Router();
 
-router.get('/search', (req: Request, res: Response) => searchShows(req, res));
-router.get('/:id', (req: Request, res: Response) => getShowDetails(req, res));
+router.get('/search', searchShows);
+router.get('/:id', getShowDetails);
+router.get('/tmdb/:query', searchTmdbShowsEndpoint);
 
-export default router; 
+export default router;
