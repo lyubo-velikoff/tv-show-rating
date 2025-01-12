@@ -18,8 +18,26 @@ export async function searchShows(query: string, page: number = 1): Promise<Sear
 }
 
 export async function getShowDetails(id: string): Promise<Show> {
-  const response = await api.get<Show>(`/api/shows/tmdb/details/${id}`);
-  return response.data;
+  try {
+    const [tmdbResponse, vikiResponse, mdlResponse, imdbResponse] = await Promise.all([
+      api.get<Show>(`/api/shows/tmdb/details/${id}`),
+      api.get<{ rating: number; href: string }>(`/api/shows/viki/${id}`).catch(() => null),
+      api.get<{ rating: number; href: string }>(`/api/shows/mdl/${id}`).catch(() => null),
+      api.get<{ rating: number; href: string }>(`/api/shows/imdb/${id}`).catch(() => null)
+    ]);
+
+    return {
+      ...tmdbResponse.data,
+      vikiRating: vikiResponse?.data?.rating,
+      vikiHref: vikiResponse?.data?.href,
+      mdlRating: mdlResponse?.data?.rating,
+      mdlHref: mdlResponse?.data?.href,
+      imdbHref: imdbResponse?.data?.href
+    };
+  } catch (error) {
+    console.error('Error fetching show details:', error);
+    throw error;
+  }
 }
 
 export async function getFavorites(): Promise<Show[]> {

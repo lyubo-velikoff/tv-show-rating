@@ -4,7 +4,7 @@ import mdlLogo from '../assets/images/mydramalist.png';
 
 interface RatingWithLogoProps {
   source: 'IMDb' | 'Viki' | 'MDL';
-  rating: number;
+  rating?: number;
   url?: string;
 }
 
@@ -34,11 +34,13 @@ const RatingWithLogo = ({ source, rating, url }: RatingWithLogoProps) => {
   const Content = () => (
     <div className="flex items-center space-x-2 bg-white dark:bg-gray-800 rounded-lg p-2 shadow-sm">
       <img src={getLogo()} alt={getAlt()} className="h-6 object-contain" />
-      <span className="font-semibold">{rating ? `${rating.toFixed(1)}/10` : 'N/A'}</span>
+      <span className="font-semibold">
+        {rating ? `${rating.toFixed(1)}/10` : 'N/A'}
+      </span>
     </div>
   );
 
-  if (url && rating > 0) {
+  if (url && rating && rating > 0) {
     return (
       <a 
         href={url} 

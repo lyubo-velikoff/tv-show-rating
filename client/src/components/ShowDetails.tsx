@@ -100,13 +100,21 @@ const ShowDetails = () => {
           <div className="mb-6">
             <h2 className="text-xl font-semibold mb-2">Ratings</h2>
             <div className="flex flex-wrap gap-4">
-              <RatingWithLogo source="IMDb" rating={show.rating} />
-              {show.vikiRating !== undefined && (
-                <RatingWithLogo source="Viki" rating={show.vikiRating} url={show.vikiHref || undefined} />
-              )}
-              {show.mdlRating !== undefined && (
-                <RatingWithLogo source="MDL" rating={show.mdlRating} url={show.mdlHref || undefined} />
-              )}
+              <RatingWithLogo 
+                source="IMDb" 
+                rating={show.rating} 
+                url={show.imdbHref || undefined}
+              />
+              <RatingWithLogo 
+                source="Viki" 
+                rating={show.vikiRating} 
+                url={show.vikiHref || undefined} 
+              />
+              <RatingWithLogo 
+                source="MDL" 
+                rating={show.mdlRating} 
+                url={show.mdlHref || undefined} 
+              />
             </div>
           </div>
           {show.description && (

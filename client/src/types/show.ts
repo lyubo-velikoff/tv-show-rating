@@ -11,6 +11,7 @@ export interface Show {
   mdlId?: string | number | null;
   mdlHref?: string | null;
   year?: string;
+  imdbHref?: string;
 }
 
 export interface SearchResponse {
