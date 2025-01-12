@@ -25,4 +25,32 @@ export async function getShowDetails(id: string): Promise<Show | null> {
     console.error('API Error:', error);
     return null;
   }
-} 
+}
+
+export async function getFavorites(): Promise<Show[]> {
+  try {
+    const response = await api.get<Show[]>('/api/favorites');
+    return response.data;
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export async function addFavorite(show: Show): Promise<void> {
+  try {
+    await api.post('/api/favorites', show);
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}
+
+export async function removeFavorite(id: string): Promise<void> {
+  try {
+    await api.delete(`/api/favorites/${id}`);
+  } catch (error) {
+    console.error('API Error:', error);
+    throw error;
+  }
+}

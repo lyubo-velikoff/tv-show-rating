@@ -1,20 +1,23 @@
 import express from 'express';
+import bodyParser from 'body-parser';
 import cors from 'cors';
 import helmet from 'helmet';
 import rateLimit from 'express-rate-limit';
 import dotenv from 'dotenv';
-import { searchShows } from './controllers/showController';
+import showRoutes from './routes/showsRoutes';
+import favoritesRoutes from './routes/favoritesRoutes';
 
 dotenv.config();
 
 const app = express();
-const port = process.env.PORT || 5000;
+const port = process.env.PORT || 3000;
 
 // Middleware
 app.use(helmet());
 app.use(cors({
   origin: process.env.CORS_ORIGIN || 'http://localhost:5173',
 }));
+app.use(bodyParser.json());
 
 // Rate limiting
 const limiter = rateLimit({
@@ -24,10 +27,11 @@ const limiter = rateLimit({
 app.use(limiter);
 
 // Routes
-app.get('/api/shows/search', searchShows);
+app.use('/api/shows', showRoutes);
+app.use('/api/favorites', favoritesRoutes);
 
 // Error handling
-app.use((err: Error, req: express.Request, res: express.Response, next: express.NextFunction) => {
+app.use((err: Error, req: express.Request, res: express.Response) => {
   console.error(err.stack);
   res.status(500).json({
     message: 'Something broke!',
@@ -37,4 +41,4 @@ app.use((err: Error, req: express.Request, res: express.Response, next: express.
 
 app.listen(port, () => {
   console.log(`🚀 Server is running on port ${port}`);
-}); 
+});
