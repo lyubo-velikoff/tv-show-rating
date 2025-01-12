@@ -2,7 +2,6 @@ import { Request, Response } from 'express';
 import { addFavorite, removeFavorite, getFavorites, FavoriteShow } from '../services/favoritesService';
 
 export function addFavoriteHandler(req: Request, res: Response): void {
-  console.log('here');
   const show: FavoriteShow = req.body;
   addFavorite(show);
   res.status(200).json({ message: 'Show added to favorites' });
